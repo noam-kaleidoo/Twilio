@@ -70,7 +70,7 @@ def whatsapp_reply():
         
         # # הורדת התמונה
         # image_data = requests.get(image_url).content
-        print("noammmm")
+        resp = MessagingResponse().message("heyy")
         
         # כאן את יכולה לטפל בתמונה כפי שאת רוצה
     else:
