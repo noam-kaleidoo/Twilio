@@ -11,7 +11,7 @@ COPY . .
 RUN pip install -r requirements.txt
 
 # Indicate that the container is listening on port 5000
-EXPOSE 5000
+EXPOSE 8080
 
 # Define the command to run when the container starts
 CMD ["python", "testTwilio.py"]
