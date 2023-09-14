@@ -1,14 +1,17 @@
-# השתמש בתמונת בסיס של פייתון
+# Use the base image of Python
 FROM python:3.9-slim
 
-# הגדרת התיקייה העבודה בתוך הקונטיינר
+# Set the working directory inside the container
 WORKDIR /app
 
-# העתקת הקוד שלך לתוך הקונטיינר
+# Copy your code into the container
 COPY . .
 
-# התקנת התלות הדרושות
+# Install the required dependencies
 RUN pip install -r requirements.txt
 
-# הגדרת הפקודה שתרוץ כאשר הקונטיינר מתחיל לרוץ
+# Indicate that the container is listening on port 5000
+EXPOSE 5000
+
+# Define the command to run when the container starts
 CMD ["python", "testTwilio.py"]
