@@ -57,7 +57,7 @@ import requests
 
 app = Flask(__name__)
 
-@app.route("/whatsapp", methods=['POST'])
+@app.route("/whatsapp", methods=['POST','GET'])
 def whatsapp_reply():
     print("Received a request from Twilio")
 
