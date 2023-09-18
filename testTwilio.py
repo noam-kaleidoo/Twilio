@@ -99,8 +99,9 @@ def whatsapp_reply():
     if request.values.get('NumMedia') != '0':
         logging.info("Image detected")
     else:
-
-        logging.info("No image detected.")
+        message_body = request.values.get('Body', 'No message content available')
+        logging.info(f"No image detected. Message content: {message_body}")
+        # logging.info("No image detected.")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
