@@ -142,8 +142,8 @@ def whatsapp_reply():
 
         # Download the image
         image_data = requests.get(image_url).content
-        blob = bucket.blob('received_image.jpg')  # File name in the bucket
-        blob.upload_from_string(image_data, content_type='image/jpeg')
+        blob = bucket.blob('received_image.jpeg')  # File name in the bucket
+        blob.upload_from_string(image_data, content_type='jpeg')
         logging.info("Image saved to Google Cloud Storage bucket")
     else:
         message_body = request.values.get('Body', 'No message content available')
