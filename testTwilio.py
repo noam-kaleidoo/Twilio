@@ -104,8 +104,7 @@ def whatsapp_reply():
 
                 # הורדת התמונה
         image_data = requests.get(image_url).content
-        with open(os.path.join(os.path.expanduser('~'), 'Desktop', 'received_image.jpg'), 'wb') as f:
-            f.write(image_data)
+        with open('received_image.jpg', 'wb') as f:            f.write(image_data)
         logging.info("Image saved to Desktop")
     else:
         message_body = request.values.get('Body', 'No message content available')
