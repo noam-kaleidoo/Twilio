@@ -95,25 +95,12 @@ app = Flask(__name__)
 def whatsapp_reply():
     logging.info("Received a request from Twilio")
 
-    # יצירת תגובה להודעה שהתקבלה
-    resp = MessagingResponse().message("תמונה התקבלה")
-    logging.info("Default response set to: תמונה התקבלה")
-    
     # בדיקה אם ההודעה היא תמונה
     if request.values.get('NumMedia') != '0':
-        # image_url = request.values.get('MediaUrl0')
-        
-        # # הורדת התמונה
-        # image_data = requests.get(image_url).content
-        resp = MessagingResponse().message("heyy")
-        logging.info("Image detected. Response set to: heyy")
-        
-        # כאן את יכולה לטפל בתמונה כפי שאת רוצה
+        logging.info("Image detected")
     else:
-        resp = MessagingResponse().message("noam123")
-        logging.info("No image detected. Response set to: noam123")
-    
-    return str(resp)
+
+        logging.info("No image detected.")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
