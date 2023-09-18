@@ -97,7 +97,9 @@ def whatsapp_reply():
 
     # בדיקה אם ההודעה היא תמונה
     if request.values.get('NumMedia') != '0':
-        logging.info("Image detected")
+        image_url = request.values.get('MediaUrl0')
+        logging.info(f"Image detected. Image URL: {image_url}")
+        # logging.info("Image detected")
     else:
         message_body = request.values.get('Body', 'No message content available')
         logging.info(f"No image detected. Message content: {message_body}")
