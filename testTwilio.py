@@ -81,14 +81,53 @@
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0', port=5000, debug=True)
 
+# from flask import Flask, request
+# from twilio.twiml.messaging_response import MessagingResponse
+# import requests
+# import logging
+# import os
+
+# # הגדרת ה-logging
+# logging.basicConfig(level=logging.INFO)
+
+# app = Flask(__name__)
+
+# @app.route("/whatsapp", methods=['POST','GET'])
+# def whatsapp_reply():
+#     logging.info("Received a request from Twilio")
+
+#     # בדיקה אם ההודעה היא תמונה
+#     if request.values.get('NumMedia') != '0':
+#         image_url = request.values.get('MediaUrl0')
+#         logging.info(f"Image detected. Image URL: {image_url}")
+#         # logging.info("Image detected")
+
+#                 # הורדת התמונה
+#         image_data = requests.get(image_url).content
+#         with open('received_image.jpg', 'wb') as f:            
+#             f.write(image_data)
+#         logging.info("Image saved to Desktop")
+#     else:
+#         message_body = request.values.get('Body', 'No message content available')
+#         logging.info(f"No image detected. Message content: {message_body}")
+#         # logging.info("No image detected.")
+
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0', port=5000, debug=True)
+
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import requests
 import logging
-import os
+from google.cloud import storage
 
-# הגדרת ה-logging
+# Setting up logging
 logging.basicConfig(level=logging.INFO)
+
+# Authenticate with Google Cloud Storage using the default service account
+storage_client = storage.Client()
+bucket_name = 'me-west1-test-bd0df372-bucket'  # Replace with your bucket name
+bucket = storage_client.bucket(bucket_name)
 
 app = Flask(__name__)
 
@@ -96,21 +135,21 @@ app = Flask(__name__)
 def whatsapp_reply():
     logging.info("Received a request from Twilio")
 
-    # בדיקה אם ההודעה היא תמונה
+    # Check if the message is an image
     if request.values.get('NumMedia') != '0':
         image_url = request.values.get('MediaUrl0')
         logging.info(f"Image detected. Image URL: {image_url}")
-        # logging.info("Image detected")
 
-                # הורדת התמונה
+        # Download the image
         image_data = requests.get(image_url).content
-        with open('received_image.jpg', 'wb') as f:            f.write(image_data)
-        logging.info("Image saved to Desktop")
+        blob = bucket.blob('received_image.jpg')  # File name in the bucket
+        blob.upload_from_string(image_data, content_type='image/jpeg')
+        logging.info("Image saved to Google Cloud Storage bucket")
     else:
         message_body = request.values.get('Body', 'No message content available')
         logging.info(f"No image detected. Message content: {message_body}")
-        # logging.info("No image detected.")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
