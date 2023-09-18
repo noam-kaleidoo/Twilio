@@ -85,6 +85,7 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import requests
 import logging
+import os
 
 # הגדרת ה-logging
 logging.basicConfig(level=logging.INFO)
@@ -100,6 +101,12 @@ def whatsapp_reply():
         image_url = request.values.get('MediaUrl0')
         logging.info(f"Image detected. Image URL: {image_url}")
         # logging.info("Image detected")
+
+                # הורדת התמונה
+        image_data = requests.get(image_url).content
+        with open(os.path.join(os.path.expanduser('~'), 'Desktop', 'received_image.jpg'), 'wb') as f:
+            f.write(image_data)
+        logging.info("Image saved to Desktop")
     else:
         message_body = request.values.get('Body', 'No message content available')
         logging.info(f"No image detected. Message content: {message_body}")
