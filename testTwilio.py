@@ -286,14 +286,9 @@ def whatsapp_reply():
             filename = None
         
         if filename:
-            if not os.path.exists(f'uploads/{username}'):
-                os.mkdir(f'uploads/{username}')
-            with open(filename, 'wb') as f:
-                f.write(r.content)
-            
-            # Upload to Google Cloud Storage
+            # Upload directly to Google Cloud Storage
             blob = bucket.blob(filename)
-            blob.upload_from_filename(filename)
+            blob.upload_from_string(r.content, content_type=content_type)
             logging.info("Image saved to Google Cloud Storage bucket")
             
             return respond('Thank you! Your image was received.')
@@ -304,6 +299,7 @@ def whatsapp_reply():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 
 
