@@ -193,13 +193,60 @@
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0', port=5000, debug=True)
 
+# import os
+# from twilio.rest import Client
+# from flask import Flask, request
+# from twilio.twiml.messaging_response import MessagingResponse
+# import requests
+# import logging
+# from google.cloud import storage
+
+# # Setting up logging
+# logging.basicConfig(level=logging.INFO)
+
+# # Authenticate with Google Cloud Storage using the default service account
+# storage_client = storage.Client()
+# bucket_name = 'me-west1-test-bd0df372-bucket'
+# bucket = storage_client.bucket(bucket_name)
+
+# # Twilio authentication and API key creation
+# account_sid = os.environ['TWILIO_ACCOUNT_SID']
+# auth_token = os.environ['TWILIO_AUTH_TOKEN']
+# client = Client(account_sid, auth_token)
+# # new_key = client.new_keys.create(friendly_name='User Joey')
+# # TWILIO_USERNAME = new_key.sid
+# # TWILIO_PASSWORD = new_key.secret  # Assuming the secret is accessible this way
+
+
+# app = Flask(__name__)
+
+# @app.route("/whatsapp", methods=['POST','GET'])
+# def whatsapp_reply():
+#     logging.info("Received a request from Twilio")
+
+#     # Check if the message is an image
+#     if request.values.get('NumMedia') != '0':
+#         image_url = request.values.get('MediaUrl0')
+#         logging.info(f"Image detected. Image URL: {image_url}")
+
+#         # Download the image with authentication
+#         image_data = requests.get(image_url, auth=(account_sid, auth_token)).content
+#         blob = bucket.blob('received_image.jpeg')  # File name in the bucket
+#         blob.upload_from_string(image_data, content_type='jpeg')
+#         logging.info("Image saved to Google Cloud Storage bucket")
+#     else:
+#         message_body = request.values.get('Body', 'No message content available')
+#         logging.info(f"No image detected. Message content: {message_body}")
+
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0', port=5000, debug=True)
+
 import os
-from twilio.rest import Client
+import requests
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
-import requests
-import logging
 from google.cloud import storage
+import logging
 
 # Setting up logging
 logging.basicConfig(level=logging.INFO)
@@ -209,37 +256,55 @@ storage_client = storage.Client()
 bucket_name = 'me-west1-test-bd0df372-bucket'
 bucket = storage_client.bucket(bucket_name)
 
-# Twilio authentication and API key creation
-account_sid = os.environ['TWILIO_ACCOUNT_SID']
-auth_token = os.environ['TWILIO_AUTH_TOKEN']
-client = Client(account_sid, auth_token)
-# new_key = client.new_keys.create(friendly_name='User Joey')
-# TWILIO_USERNAME = new_key.sid
-# TWILIO_PASSWORD = new_key.secret  # Assuming the secret is accessible this way
-
-
 app = Flask(__name__)
+
+def respond(message):
+    response = MessagingResponse()
+    response.message(message)
+    return str(response)
 
 @app.route("/whatsapp", methods=['POST','GET'])
 def whatsapp_reply():
     logging.info("Received a request from Twilio")
 
-    # Check if the message is an image
-    if request.values.get('NumMedia') != '0':
-        image_url = request.values.get('MediaUrl0')
-        logging.info(f"Image detected. Image URL: {image_url}")
-
-        # Download the image with authentication
-        image_data = requests.get(image_url, auth=(account_sid, auth_token)).content
-        blob = bucket.blob('received_image.jpeg')  # File name in the bucket
-        blob.upload_from_string(image_data, content_type='jpeg')
-        logging.info("Image saved to Google Cloud Storage bucket")
+    sender = request.values.get('From')
+    message = request.values.get('Body')
+    media_url = request.values.get('MediaUrl0')
+    
+    if media_url:
+        r = requests.get(media_url, auth=(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN']))
+        content_type = r.headers['Content-Type']
+        username = sender.split(':')[1]  # remove the whatsapp: prefix from the number
+        
+        if content_type == 'image/jpeg':
+            filename = f'uploads/{username}/{message}.jpg'
+        elif content_type == 'image/png':
+            filename = f'uploads/{username}/{message}.png'
+        elif content_type == 'image/gif':
+            filename = f'uploads/{username}/{message}.gif'
+        else:
+            filename = None
+        
+        if filename:
+            if not os.path.exists(f'uploads/{username}'):
+                os.mkdir(f'uploads/{username}')
+            with open(filename, 'wb') as f:
+                f.write(r.content)
+            
+            # Upload to Google Cloud Storage
+            blob = bucket.blob(filename)
+            blob.upload_from_filename(filename)
+            logging.info("Image saved to Google Cloud Storage bucket")
+            
+            return respond('Thank you! Your image was received.')
+        else:
+            return respond('The file that you submitted is not a supported image type.')
     else:
-        message_body = request.values.get('Body', 'No message content available')
-        logging.info(f"No image detected. Message content: {message_body}")
+        return respond('Please send an image!')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 
 
