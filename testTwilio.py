@@ -122,6 +122,8 @@ def whatsapp_reply():
             filename = f'uploads/{username}/{message}_{timestamp}.webp'
         elif content_type == 'video/mp4':
             filename = f'uploads/{username}/{message}_{timestamp}.mp4'
+        elif content_type == 'video/hevc':
+            filename = f'uploads/{username}/{message}_{timestamp}.hevc'
         else:
             filename = None
         
