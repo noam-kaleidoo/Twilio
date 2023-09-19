@@ -115,6 +115,8 @@ def whatsapp_reply():
             filename = f'uploads/{username}/{message}_{timestamp}.png'
         elif content_type == 'image/gif':
             filename = f'uploads/{username}/{message}_{timestamp}.gif'
+        elif content_type == 'image/webp':
+            filename = f'uploads/{username}/{message}_{timestamp}.webp'
         else:
             filename = None
         
