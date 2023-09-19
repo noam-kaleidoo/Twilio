@@ -115,6 +115,43 @@
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0', port=5000, debug=True)
 
+# from flask import Flask, request
+# from twilio.twiml.messaging_response import MessagingResponse
+# import requests
+# import logging
+# from google.cloud import storage
+
+# # Setting up logging
+# logging.basicConfig(level=logging.INFO)
+
+# # Authenticate with Google Cloud Storage using the default service account
+# storage_client = storage.Client()
+# bucket_name = 'me-west1-test-bd0df372-bucket'  # Replace with your bucket name
+# bucket = storage_client.bucket(bucket_name)
+
+# app = Flask(__name__)
+
+# @app.route("/whatsapp", methods=['POST','GET'])
+# def whatsapp_reply():
+#     logging.info("Received a request from Twilio")
+
+#     # Check if the message is an image
+#     if request.values.get('NumMedia') != '0':
+#         image_url = request.values.get('MediaUrl0')
+#         logging.info(f"Image detected. Image URL: {image_url}")
+
+#         # Download the image
+#         image_data = requests.get(image_url).content
+#         blob = bucket.blob('received_image.jpeg')  # File name in the bucket
+#         blob.upload_from_string(image_data, content_type='jpeg')
+#         logging.info("Image saved to Google Cloud Storage bucket")
+#     else:
+#         message_body = request.values.get('Body', 'No message content available')
+#         logging.info(f"No image detected. Message content: {message_body}")
+
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0', port=5000, debug=True)
+
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import requests
@@ -129,6 +166,10 @@ storage_client = storage.Client()
 bucket_name = 'me-west1-test-bd0df372-bucket'  # Replace with your bucket name
 bucket = storage_client.bucket(bucket_name)
 
+# Twilio authentication details
+TWILIO_USERNAME = 'ACc3d9016c4e2b8238a5178a2f82be4269'
+TWILIO_PASSWORD = '3d74cff74d0784f7688c7e74db58d23c'
+
 app = Flask(__name__)
 
 @app.route("/whatsapp", methods=['POST','GET'])
@@ -140,8 +181,8 @@ def whatsapp_reply():
         image_url = request.values.get('MediaUrl0')
         logging.info(f"Image detected. Image URL: {image_url}")
 
-        # Download the image
-        image_data = requests.get(image_url).content
+        # Download the image with authentication
+        image_data = requests.get(image_url, auth=(TWILIO_USERNAME, TWILIO_PASSWORD)).content
         blob = bucket.blob('received_image.jpeg')  # File name in the bucket
         blob.upload_from_string(image_data, content_type='jpeg')
         logging.info("Image saved to Google Cloud Storage bucket")
@@ -151,5 +192,6 @@ def whatsapp_reply():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 
