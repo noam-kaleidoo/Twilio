@@ -104,8 +104,9 @@ def whatsapp_reply():
         # Fetch the media content using Twilio credentials for authentication
         r = requests.get(media_url, auth=(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN']))
         content_type = r.headers['Content-Type']
-        respond('noammmmmm')
-        respond(content_type)
+
+        logging.info(f"Content Type: {content_type}")
+        logging.info(f"Message: {message}")
         # Extract the sender's phone number (without the "whatsapp:" prefix)
         username = sender.split(':')[1]
         
