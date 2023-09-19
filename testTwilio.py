@@ -131,7 +131,9 @@ def whatsapp_reply():
         # If no media is attached, send a response asking for an image
         return respond('Please send an image!')
 
-# ... [השאר הקוד לא משתנה]
+# Run the Flask app
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 
 
