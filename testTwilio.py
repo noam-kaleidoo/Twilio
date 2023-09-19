@@ -217,11 +217,15 @@ new_key = client.new_keys.create(friendly_name='User Joey')
 TWILIO_USERNAME = new_key.sid
 TWILIO_PASSWORD = new_key.secret  # Assuming the secret is accessible this way
 
+
 app = Flask(__name__)
 
 @app.route("/whatsapp", methods=['POST','GET'])
 def whatsapp_reply():
     logging.info("Received a request from Twilio")
+    logging.info(f"usernameL: {TWILIO_USERNAME}")
+    logging.info(f"password: {TWILIO_PASSWORD}")
+
 
     # Check if the message is an image
     if request.values.get('NumMedia') != '0':
